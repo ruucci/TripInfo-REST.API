@@ -16,6 +16,7 @@ Makefile.in
 *.pidb
 *.userprefs
 *.usertasks
+appSettings.json
 config.log
 config.make
 config.status
