@@ -65,6 +65,19 @@ namespace TripInfoREST.API.Controllers
                 return BadRequest();
             }
 
+            if (attraction.Description == attraction.Name)
+            {
+                ModelState.AddModelError(nameof(AttractionForCreationDto),
+                    "The provided description should be different from the name.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // return 422
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+
             if (!_tripInfoRepository.DestinationExists(destinationId))
             {
                 return NotFound();
