@@ -8,7 +8,7 @@ namespace TripInfoREST.API.Entities
         public TripContext(DbContextOptions<TripContext> options)
            : base(options)
         {
-            Database.Migrate();
+            Database.EnsureCreated();
         }
 
         public DbSet<Destination> Destinations { get; set; }

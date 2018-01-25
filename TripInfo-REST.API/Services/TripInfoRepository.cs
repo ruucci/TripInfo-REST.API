@@ -66,14 +66,14 @@ namespace TripInfoREST.API.Services
 
         public IEnumerable<Destination> GetDestinations()
         {
-            return _context.Destinations.OrderBy(d => d.Name).ThenBy(d => d.State);
+            return _context.Destinations.OrderBy(d => d.Name).ThenBy(d => d.State).ToList();
         }
 
         public IEnumerable<Destination> GetDestinations(IEnumerable<Guid> destinationIds)
         {
-            return _context.Destinations.Where(a => destinationIds.Contains(a.Id))
-                           .OrderBy(a => a.Name)
-                           .OrderBy(a => a.State)
+            return _context.Destinations.Where(d => destinationIds.Contains(d.Id))
+                           .OrderBy(d => d.Name)
+                           .OrderBy(d => d.State)
                            .ToList();
         }
 
@@ -91,7 +91,7 @@ namespace TripInfoREST.API.Services
         public IEnumerable<Attraction> GetAttractionsForDestination(Guid destinationId)
         {
             return _context.Attractions
-                           .Where(b => b.DestinationId == destinationId).OrderBy(a => a.Name).ToList();
+                           .Where(a => a.DestinationId == destinationId).OrderBy(a => a.Name).ToList();
         }
 
         public void UpdateAttractionForDestination(Attraction attraction)

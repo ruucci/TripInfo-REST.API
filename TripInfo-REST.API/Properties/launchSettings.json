@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "TripInfo_REST.API": {
+    "TripInfoREST.API": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

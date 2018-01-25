@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace TripInfo_REST.API
+namespace TripInfoREST.API
 {
     public class Program
     {
