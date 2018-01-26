@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TripInfoREST.API.Models
 {
-    public class AttractionForManipulationDto
+    public abstract class AttractionForManipulationDto
     {
-        [Required(ErrorMessage = "You should fill out a name.")]
+        [Required(ErrorMessage = "Name is a required field.")]
         [MaxLength(100, ErrorMessage = "The name shouldn't have more than 100 characters.")]
         public string Name { get; set; }
 

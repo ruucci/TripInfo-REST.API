@@ -13,10 +13,12 @@ namespace TripInfoREST.API.Controllers
     public class DestinationsController : Controller
     {
         private ITripInfoRepository _tripInfoRepository;
+        private IMailService _mailService;
 
-        public DestinationsController(ITripInfoRepository tripInfoRepository)
+        public DestinationsController(ITripInfoRepository tripInfoRepository, IMailService mailService)
         {
             _tripInfoRepository = tripInfoRepository;
+            _mailService = mailService;
         }
 
         [HttpGet()]
@@ -93,6 +95,8 @@ namespace TripInfoREST.API.Controllers
             {
                 throw new Exception($"Deleting destination {id} failed on save.");
             }
+
+            _mailService.Send("Destination has been deleted.", $"Destination {destinationFromRepo.Name} with id {destinationFromRepo.Id} was deleted");
 
             return NoContent();
         }

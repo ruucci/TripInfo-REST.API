@@ -40,6 +40,11 @@ namespace TripInfoREST.API
                 setupAction.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
 
             });
+#if DEBUG
+            services.AddTransient<IMailService, LocalMailService>();
+#else
+            services.AddTransient<IMailService, CloudMailService>();
+#endif
 
             // register the DbContext on the container, getting the connection string from
             // appSettings (note: use this during development; in a production environment,

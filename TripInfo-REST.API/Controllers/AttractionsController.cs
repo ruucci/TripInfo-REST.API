@@ -16,11 +16,13 @@ namespace TripInfoREST.API.Controllers
     {
         private ITripInfoRepository _tripInfoRepository;
         private ILogger<AttractionsController> _logger;
+        private IMailService _mailService;
 
-        public AttractionsController(ITripInfoRepository tripInfoRepository, ILogger<AttractionsController> logger)
+        public AttractionsController(ITripInfoRepository tripInfoRepository, ILogger<AttractionsController> logger,IMailService mailService)
         {
             _tripInfoRepository = tripInfoRepository;
             _logger = logger;
+            _mailService = mailService;
         }
 
         [HttpGet()]
@@ -121,6 +123,7 @@ namespace TripInfoREST.API.Controllers
             }
 
             _logger.LogInformation(100, $"Attraction {id} for destination {destinationId} was deleted.");
+            _mailService.Send("Attraction has been deleted.", $"Attraction {attractionForDestinationFromRepo.Name} with id {attractionForDestinationFromRepo.Id} was deleted");
 
             return NoContent();
         }
