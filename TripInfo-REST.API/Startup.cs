@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using NLog.Extensions.Logging;
 using TripInfoREST.API.Entities;
 using TripInfoREST.API.Helpers;
@@ -39,7 +43,13 @@ namespace TripInfoREST.API
                 setupAction.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
                 setupAction.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
 
+            })
+            .AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver =
+                new CamelCasePropertyNamesContractResolver();
             });
+
 #if DEBUG
             services.AddTransient<IMailService, LocalMailService>();
 #else
@@ -55,6 +65,15 @@ namespace TripInfoREST.API
 
             // register the repository
             services.AddScoped<ITripInfoRepository, TripInfoRepository>();
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            services.AddScoped<IUrlHelper>(implementationFactory =>
+            {
+                var actionContext = implementationFactory.GetService<IActionContextAccessor>()
+                .ActionContext;
+                return new UrlHelper(actionContext);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using TripInfoREST.API.Entities;
+using TripInfoREST.API.Helpers;
 
 namespace TripInfoREST.API.Services
 {
     public interface ITripInfoRepository
     {
-        IEnumerable<Destination> GetDestinations();
+        PagedList<Destination> GetDestinations(DestinationsResourceParameters destinationsResourceParameters);
         Destination GetDestination(Guid destinationId);
         IEnumerable<Destination> GetDestinations(IEnumerable<Guid> destinationIds);
         void AddDestination(Destination destination);
