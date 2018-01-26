@@ -7,7 +7,7 @@ namespace TripInfoREST.API.Services
     public class CloudMailService : IMailService
     {
         private string _mailTo = Startup.Configuration["mailSettings:mailToAddress"];
-        private string _mailFrom = Startup.Configuration["mailSettings:mailFromAddress"];
+        private string _mailFrom = Startup.Configuration["mailSettings:mailFromProductionAddress"];
         private string _mailUsername = Startup.Configuration["mailSettings:azure-username"];
         private string _mailPassword = Startup.Configuration["mailSettings:azure-password"];
 
