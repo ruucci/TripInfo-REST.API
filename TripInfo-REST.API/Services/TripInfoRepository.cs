@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using TripInfoREST.API.Entities;
 using TripInfoREST.API.Helpers;
+using TripInfoREST.API.Models;
 
 namespace TripInfoREST.API.Services
 {
     public class TripInfoRepository : ITripInfoRepository
     {
         private TripContext _context;
+        private IPropertyMappingService _propertyMappingService;
 
-        public TripInfoRepository(TripContext context)
+        public TripInfoRepository(TripContext context, IPropertyMappingService propertyMappingService)
         {
             _context = context;
+            _propertyMappingService = propertyMappingService;
         }   
 
         public void AddDestination(Destination destination)
@@ -77,11 +80,7 @@ namespace TripInfoREST.API.Services
             //    .OrderBy(a => a.FirstName)
             //    .ThenBy(a => a.LastName).AsQueryable();
 
-            var collectionBeforePaging =
-                _context.Destinations
-                        .OrderBy(a => a.Name)
-                        .ThenBy(a => a.State)
-                .AsQueryable();
+            var collectionBeforePaging =_context.Destinations.ApplySort(destinationsResourceParameters.OrderBy, _propertyMappingService.GetPropertyMapping<DestinationDto, Destination>());
 
             if (!string.IsNullOrEmpty(destinationsResourceParameters.Genre))
             {
@@ -114,7 +113,7 @@ namespace TripInfoREST.API.Services
             return _context.Destinations.Where(a => destinationIds.Contains(a.Id))
                            .OrderBy(a => a.Name)
                            .OrderBy(a => a.State)
-                .ToList();
+                           .ToList();
         }
 
 

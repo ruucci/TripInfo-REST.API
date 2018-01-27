@@ -18,7 +18,8 @@ namespace TripInfoREST.API.Controllers
         private ILogger<AttractionsController> _logger;
         private IMailService _mailService;
 
-        public AttractionsController(ITripInfoRepository tripInfoRepository, ILogger<AttractionsController> logger,IMailService mailService)
+        public AttractionsController(ITripInfoRepository tripInfoRepository, ILogger<AttractionsController> logger,
+                                     IMailService mailService)
         {
             _tripInfoRepository = tripInfoRepository;
             _logger = logger;

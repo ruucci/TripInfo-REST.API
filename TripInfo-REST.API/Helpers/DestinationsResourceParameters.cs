@@ -22,5 +22,9 @@ namespace TripInfoREST.API.Helpers
         public string Genre { get; set; }
 
         public string SearchQuery { get; set; }
+
+        public string OrderBy { get; set; } = "Location";
+
+        public string Fields { get; set; }
     }
 }

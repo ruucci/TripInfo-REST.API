@@ -16,25 +16,42 @@ namespace TripInfoREST.API.Controllers
         private ITripInfoRepository _tripInfoRepository;
         private IMailService _mailService;
         private IUrlHelper _urlHelper;
+        private IPropertyMappingService _propertyMappingService;
+        private ITypeHelperService _typeHelperService;
 
-        public DestinationsController(ITripInfoRepository tripInfoRepository, IMailService mailService, IUrlHelper urlHelper)
+        public DestinationsController(ITripInfoRepository tripInfoRepository, IMailService mailService, IUrlHelper urlHelper,
+                                      IPropertyMappingService propertyMappingService, ITypeHelperService typeHelperService)
         {
             _tripInfoRepository = tripInfoRepository;
             _mailService = mailService;
             _urlHelper = urlHelper;
+            _propertyMappingService = propertyMappingService;
+            _typeHelperService = typeHelperService;
         }
 
         [HttpGet(Name = "GetDestinations")]
-        public IActionResult GetDestinations(DestinationsResourceParameters destinationssResourceParameters)
+        public IActionResult GetDestinations(DestinationsResourceParameters destinationsResourceParameters)
         {
-            var destinationsFromRepo = _tripInfoRepository.GetDestinations(destinationssResourceParameters);
+            if (!_propertyMappingService.ValidMappingExistsFor<DestinationDto, Destination>
+                (destinationsResourceParameters.OrderBy))
+            {
+                return BadRequest();
+            }
+
+            if (!_typeHelperService.TypeHasProperties<DestinationDto>
+                (destinationsResourceParameters.Fields))
+            {
+                return BadRequest();
+            }
+
+            var destinationsFromRepo = _tripInfoRepository.GetDestinations(destinationsResourceParameters);
 
             var previousPageLink = destinationsFromRepo.HasPrevious ?
-                CreateDestinationsResourceUri(destinationssResourceParameters,
+                CreateDestinationsResourceUri(destinationsResourceParameters,
                 ResourceUriType.PreviousPage) : null;
 
             var nextPageLink = destinationsFromRepo.HasNext ?
-                CreateDestinationsResourceUri(destinationssResourceParameters,
+                CreateDestinationsResourceUri(destinationsResourceParameters,
                 ResourceUriType.NextPage) : null;
 
             var paginationMetadata = new
@@ -52,7 +69,7 @@ namespace TripInfoREST.API.Controllers
 
 
             var destinations = Mapper.Map<IEnumerable<DestinationDto>>(destinationsFromRepo);
-            return Ok(destinations);
+            return Ok(destinations.ShapeData(destinationsResourceParameters.Fields));
         }
 
         private string CreateDestinationsResourceUri(
@@ -65,6 +82,8 @@ namespace TripInfoREST.API.Controllers
                     return _urlHelper.Link("GetDestinations",
                       new
                       {
+                          fields = destinationsResourceParameters.Fields,
+                          orderby = destinationsResourceParameters.OrderBy,
                           searchQuery = destinationsResourceParameters.SearchQuery,
                           genre = destinationsResourceParameters.Genre,
                           pageNumber = destinationsResourceParameters.PageNumber - 1,
@@ -74,6 +93,8 @@ namespace TripInfoREST.API.Controllers
                     return _urlHelper.Link("GetDestinations",
                       new
                       {
+                          fields = destinationsResourceParameters.Fields,
+                          orderby = destinationsResourceParameters.OrderBy,
                           searchQuery = destinationsResourceParameters.SearchQuery,
                           genre = destinationsResourceParameters.Genre,
                           pageNumber = destinationsResourceParameters.PageNumber + 1,
@@ -84,6 +105,8 @@ namespace TripInfoREST.API.Controllers
                     return _urlHelper.Link("GetDestinations",
                     new
                     {
+                        fields = destinationsResourceParameters.Fields,
+                        orderby = destinationsResourceParameters.OrderBy,
                         searchQuery = destinationsResourceParameters.SearchQuery,
                         genre = destinationsResourceParameters.Genre,
                         pageNumber = destinationsResourceParameters.PageNumber,
@@ -95,6 +118,12 @@ namespace TripInfoREST.API.Controllers
         [HttpGet("{id}", Name = "GetDestination")]
         public IActionResult GetDestination(Guid id, [FromQuery] string fields)
         {
+            if (!_typeHelperService.TypeHasProperties<DestinationDto>
+              (fields))
+            {
+                return BadRequest();
+            }
+
             var destinationFromRepo = _tripInfoRepository.GetDestination(id);
 
             if (destinationFromRepo == null)
@@ -103,7 +132,7 @@ namespace TripInfoREST.API.Controllers
             }
 
             var destination = Mapper.Map<DestinationDto>(destinationFromRepo);
-            return Ok(destination);
+            return Ok(destination.ShapeData(fields));
         }
 
         [HttpPost]
