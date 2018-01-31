@@ -68,6 +68,11 @@ namespace TripInfoREST.API.Services
             return _context.Destinations.FirstOrDefault(d => d.Id == destinationId);
         }
 
+        //public TokenRequest GetTokenRequest(string username, string password)
+        //{
+        //    return _context.TokenRequests.FirstOrDefault(t => t.Username == username && t.Password == password);
+        //}
+
         public IEnumerable<Destination> GetDestinations()
         {
             return _context.Destinations.OrderBy(d => d.Name).ThenBy(d => d.State).ToList();

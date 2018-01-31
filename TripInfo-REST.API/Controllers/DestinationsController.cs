@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using TripInfoREST.API.Entities;
 using TripInfoREST.API.Helpers;
 using TripInfoREST.API.Models;
@@ -11,6 +17,7 @@ using TripInfoREST.API.Services;
 namespace TripInfoREST.API.Controllers
 {
     [Route("api/destinations")]
+    [Authorize]
     public class DestinationsController : Controller
     {
         private ITripInfoRepository _tripInfoRepository;
@@ -18,17 +25,21 @@ namespace TripInfoREST.API.Controllers
         private IUrlHelper _urlHelper;
         private IPropertyMappingService _propertyMappingService;
         private ITypeHelperService _typeHelperService;
+        private IConfiguration _configuration;
 
         public DestinationsController(ITripInfoRepository tripInfoRepository, IMailService mailService, IUrlHelper urlHelper,
-                                      IPropertyMappingService propertyMappingService, ITypeHelperService typeHelperService)
+                                      IPropertyMappingService propertyMappingService, ITypeHelperService typeHelperService,
+                                      IConfiguration configuration)
         {
             _tripInfoRepository = tripInfoRepository;
             _mailService = mailService;
             _urlHelper = urlHelper;
             _propertyMappingService = propertyMappingService;
             _typeHelperService = typeHelperService;
+            _configuration = configuration;
         }
 
+        [AllowAnonymous]
         [HttpGet(Name = "GetDestinations")]
         public IActionResult GetDestinations(DestinationsResourceParameters destinationsResourceParameters)
         {
@@ -115,6 +126,7 @@ namespace TripInfoREST.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}", Name = "GetDestination")]
         public IActionResult GetDestination(Guid id, [FromQuery] string fields)
         {

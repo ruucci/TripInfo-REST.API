@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using TripInfoREST.API.Services;
 
 namespace TripInfoREST.API.Controllers
 {
+    [Authorize]
     [Route("api/destinations/{destinationId}/attractions")]
     public class AttractionsController : Controller
     {
@@ -26,6 +28,7 @@ namespace TripInfoREST.API.Controllers
             _mailService = mailService;
         }
 
+        [AllowAnonymous]
         [HttpGet()]
         public IActionResult GetAttractionsForDestination(Guid destinationId)
         {
@@ -41,6 +44,7 @@ namespace TripInfoREST.API.Controllers
             return Ok(attractionsForDestination);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}", Name = "GetAttractionForDestination")]
         public IActionResult GetAttractionForDestination(Guid destinationId, Guid id)
         {

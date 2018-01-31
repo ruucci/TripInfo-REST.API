@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TripInfoREST.API.Entities;
 using TripInfoREST.API.Helpers;
@@ -10,6 +11,7 @@ using TripInfoREST.API.Services;
 
 namespace TripInfoREST.API.Controllers
 {
+    [Authorize]
     [Route("api/destinationcollections")]
     public class DestinationCollectionsController : Controller
     {
@@ -53,6 +55,7 @@ namespace TripInfoREST.API.Controllers
 
         // (key1,key2, ...)
 
+        [AllowAnonymous]
         [HttpGet("({ids})", Name = "GetDestinationCollection")]
         public IActionResult GetDestinationCollection(
             [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)

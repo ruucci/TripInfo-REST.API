@@ -9,6 +9,7 @@ namespace TripInfoREST.API.Services
     {
         PagedList<Destination> GetDestinations(DestinationsResourceParameters destinationsResourceParameters);
         Destination GetDestination(Guid destinationId);
+        //TokenRequest GetTokenRequest(string username, string password);
         IEnumerable<Destination> GetDestinations(IEnumerable<Guid> destinationIds);
         void AddDestination(Destination destination);
         void DeleteDestination(Destination destination);

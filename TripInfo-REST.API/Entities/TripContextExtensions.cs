@@ -150,6 +150,23 @@ namespace TripInfoREST.API.Entities
                 }
             };
 
+            //var tokenRequests = new List<TokenRequest>()
+            //{
+            //    new TokenRequest()
+            //    {
+            //        Id = new Guid("0647a8e4-64dd-4f31-81be-90ddc8cf71d4"),
+            //        Username = "Ruchi",
+            //        Password = "password"
+            //    },
+            //    new TokenRequest()
+            //    {
+            //        Id = new Guid("805a7306-3e56-4a26-9772-b0037dcbc14b"),
+            //        Username = "Swapnil",
+            //        Password = "password"
+            //    }
+            //};
+
+            //context.TokenRequests.AddRange(tokenRequests);
             context.Destinations.AddRange(destinations);
             context.SaveChanges();
         }

@@ -19,6 +19,11 @@ using NLog.Extensions.Logging;
 using TripInfoREST.API.Entities;
 using TripInfoREST.API.Helpers;
 using TripInfoREST.API.Services;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using AutoMapper;
 
 namespace TripInfoREST.API
 {
@@ -37,6 +42,35 @@ namespace TripInfoREST.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+
             services.AddMvc(setupAction =>
             {
                 setupAction.ReturnHttpNotAcceptable = true;
@@ -50,20 +84,17 @@ namespace TripInfoREST.API
                 new CamelCasePropertyNamesContractResolver();
             });
 
+            //services.AddAutoMapper();
+
 #if DEBUG
             services.AddTransient<IMailService, LocalMailService>();
 #else
             services.AddTransient<IMailService, CloudMailService>();
 #endif
-
-            // register the DbContext on the container, getting the connection string from
-            // appSettings (note: use this during development; in a production environment,
-            // it's better to store the connection string in an environment variable)
-
             var connectionString = Configuration["connectionStrings:tripDBConnectionString"];
             services.AddDbContext<TripContext>(o => o.UseSqlServer(connectionString));
 
-            // register the repository
+
             services.AddScoped<ITripInfoRepository, TripInfoRepository>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -78,11 +109,27 @@ namespace TripInfoREST.API
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
 
             services.AddTransient<ITypeHelperService, TypeHelperService>();
+
+            services.AddSwaggerGen(c => 
+                                    {
+                                        c.SwaggerDoc("v1", new Info{ Title = "Trip-Info API Sandbox", Description = "An API Sandbox for all of the available endpoints in my API." });
+                                    }
+                                  );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, TripContext tripContext)
         {
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+
+            app.UseAuthentication();
+
+
             loggerFactory.AddNLog();
 
             if (env.IsDevelopment())
@@ -128,6 +175,21 @@ namespace TripInfoREST.API
                 cfg.CreateMap<Models.AttractionForUpdateDto, Entities.Attraction>();
 
                 cfg.CreateMap<Entities.Attraction, Models.AttractionForUpdateDto>();
+
+                //cfg.CreateMap<Entities.TokenRequest,Models.TokenRequestDto>();
+
+                //cfg.CreateMap<Models.TokenRequestDto, Entities.TokenRequest>();
+
+                cfg.CreateMap<Models.UserForCreationDto, Entities.User>();
+                cfg.CreateMap<Models.UserForUpdateDto, Entities.User>();
+                cfg.CreateMap<Entities.User, Models.UserDto>();
+
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Core App");
             });
 
             //tripContext.EnsureSeedDataForContext();
