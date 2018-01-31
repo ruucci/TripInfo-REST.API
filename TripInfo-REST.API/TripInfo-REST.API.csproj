@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Helpers\AppException.cs" />
     <Compile Remove="Services\IUserService.cs" />
     <Compile Remove="Migrations\20180121052456_InitialMigration.Designer.cs" />
     <Compile Remove="Migrations\20180121052456_InitialMigration.cs" />
