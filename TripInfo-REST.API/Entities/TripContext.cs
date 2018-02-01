@@ -14,6 +14,5 @@ namespace TripInfoREST.API.Entities
         public DbSet<Destination> Destinations { get; set; }
         public DbSet<Attraction> Attractions { get; set; }
         public DbSet<User> Users { get; set; }
-        //public DbSet<TokenRequest> TokenRequests { get; set; }
     }
 }
